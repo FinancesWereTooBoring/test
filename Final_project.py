@@ -3,9 +3,11 @@ import numpy as np
 import string
 import nltk
 import keras
+import pickle
+import pdb
 
 
-from keras.models import Sequential
+from keras.models import Sequential, load_model
 from keras.layers import Dense
 from keras.layers import Dropout
 from keras.layers import Bidirectional
@@ -17,8 +19,13 @@ from sklearn.model_selection import train_test_split
 from keras.preprocessing.text import Tokenizer
 from keras_preprocessing.sequence import pad_sequences
 
+
 #%% Preprocessing data
-input_text = open('Text_lecture1.txt', encoding = 'utf8').read()
+input_text_1 = open('Text_lecture1.txt', encoding = 'utf8').read()
+input_text_2 = open('Text_lecture2.txt', encoding = 'utf8').read()
+input_text_3 = open('Text_lecture3.txt', encoding = 'utf8').read()
+input_text = input_text_1 + input_text_2 + input_text_3
+len(input_text)
 
 text = ""
 for line in input_text:
@@ -61,7 +68,7 @@ num_unique = len(unique_words)
 #%% Training
 
 #Parameters based on the statistics
-vocab_size = 1800  #chosen on the number of unique words, should not be more than the number of unique words
+vocab_size = num_unique - 100 #chosen on the number of unique words, should not be more than the number of unique words
 oov_tok = '<OOV>' #how the words outside the vocab_size are labelled
 embedding_dim = 50 #the dimension of the word embedding
 padding_type='post' #??
@@ -106,18 +113,25 @@ model.compile(loss='categorical_crossentropy',  #this was used in the example bu
               optimizer='adam',                 #The optimizer instance, can also use gradient descent SGD
               metrics=['accuracy'])             #The way accuracy is measured
 
-num_epochs = 10         #the number of epochs
+num_epochs = 20         #the number of epochs
 batch = 64              #the batch size, bigger batch means less time to update and learn, thus worse results?
-split = 0.2             #The train test split, 0.2 => 20% test, 80% train
+split = 0.3             #The train test split, 0.2 => 20% test, 80% train
 
 history = model.fit(X, y, epochs=num_epochs, batch_size = batch, verbose=1, validation_split=split)
+
+model.save("fuckucas.h5")
+pickle.dump(history, open("history.p", "wb"))
+model = load_model('fuckucas.h5')
+history = pickle.load(open("history.p", "rb"))
 
 #%% Words prediction
 
 #To retrieve the words need to go from index to word
 index_word = dict(map(reversed, tokenizer.word_index.items()))
 
-def next_words(input_str, num_predict):             #method to predict the next n words, given an input string
+def next_words(input_str, num_predict):
+
+    #method to predict the next n words, given an input string
     output = ""
     for i in range(num_predict):
         token = tokenizer.texts_to_sequences([input_str])
@@ -139,8 +153,10 @@ for value in pattern:
     random_predict_seen += index_word[value] + " "
 
 
-num_words_pred = 2   
-output = next_words("Today we are going to talk about the brain of the brain of", num_words_pred)
+
+num_words_pred = 20
+
+output = next_words("my brain is ", num_words_pred)
 
 
 """
@@ -159,3 +175,5 @@ output_unseen= next_words(random_predict_unseen, num_words_pred)
     
     
 
+
+# %%
