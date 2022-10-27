@@ -56,7 +56,8 @@ class LSTM_word_pred():
 
         self.model = Sequential()
         self.model.add(Embedding(self.vocab_size, self.embedding_dim, input_length=self.seq_length ))       #The words embedding with dimensions is added
-        self.model.add(Bidirectional(keras.layers.LSTM(64)))                                 #The LSTM is added, not sure if we need Bidirectional and what value for LSTM is best
+        #self.model.add(Bidirectional(keras.layers.LSTM(64)))                                 #The LSTM is added, not sure if we need Bidirectional and what value for LSTM is best
+        self.model.add(LSTM(64))
         self.model.add(Dropout(0.2))                                                         #Dropout decreases overfitting, by leaving some LSTM cell out of the backpropagation for each epoch
         self.model.add(Dense(self.vocab_size, activation='softmax'))                              #Dense makes sure the output vector is of size: vocab_size
 
