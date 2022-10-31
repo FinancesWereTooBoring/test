@@ -2,7 +2,7 @@ import numpy as np
 import pdb
 
 def next_words(model_x, input_str_x, num_predict_x):
-    pdb.set_trace()
+
     try:
         return prediction(model_x, input_str_x, num_predict_x)
     except:
