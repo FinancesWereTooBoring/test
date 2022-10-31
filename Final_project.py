@@ -29,7 +29,9 @@ len(input_text)
 
 text = ""
 for line in input_text:
-    removed_enter = line.replace('\n', ". ") #remove the enters from the YouTube transcript
+    removed_music = line.replace("[Music]", "") #remove when transcript adds music to the script
+    removed_uh = removed_music.replace(' uh ', " ") #remove it when mario says uh
+    final_line = removed_uh.replace('\n', ". ") #remove the enters from the YouTube transcript
     final_line = removed_enter.replace(" Music", "")
      
     text += final_line
@@ -73,7 +75,7 @@ oov_tok = '<OOV>' #how the words outside the vocab_size are labelled
 embedding_dim = 50 #the dimension of the word embedding
 padding_type='post' #??
 trunc_type='post' #??
-seq_length = 50 #the length of sequences used in the LSTM
+seq_length = 50 #the length of sequences used in the LSTM, maybe decrease this so we don't have to do the random sentence. 
 
 # tokenizes sentences
 tokenizer = Tokenizer(num_words = vocab_size, oov_token=oov_tok)
@@ -103,7 +105,8 @@ y = np_utils.to_categorical(dataY)
 
 model = Sequential()
 model.add(Embedding(vocab_size, embedding_dim, input_length=seq_length ))       #The words embedding with dimensions is added
-model.add(Bidirectional(keras.layers.LSTM(64)))                                 #The LSTM is added, not sure if we need Bidirectional and what value for LSTM is best
+model.add(LSTM(64))
+#model.add(Bidirectional(keras.layers.LSTM(64)))                                 #The LSTM is added, not sure if we need Bidirectional and what value for LSTM is best
 model.add(Dropout(0.2))                                                         #Dropout decreases overfitting, by leaving some LSTM cell out of the backpropagation for each epoch
 model.add(Dense(vocab_size, activation='softmax'))                              #Dense makes sure the output vector is of size: vocab_size
 # can add more LSTM layers, see the characterbased prediction LSTM model 2
